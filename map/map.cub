@@ -1,0 +1,14 @@
+NO ./texture/nourth_texture.xpm
+WE ./texture/west_texture.xpm
+
+
+
+
+SO ./texture/south_texture.xpm
+EA ./texture/east_texture.xpm
+
+
+
+
+F 200,25, 102
+C 220,100,2
