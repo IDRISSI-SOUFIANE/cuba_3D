@@ -6,7 +6,7 @@
 /*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 10:08:33 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/07/22 11:38:15 by sidrissi         ###   ########.fr       */
+/*   Updated: 2025/07/25 13:07:14 by sidrissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int ft_start()
 	_2darray = ft_split(join_lines, "\n");
 	if (!_2darray)
 		return (free(join_lines), 1);
-	// init_window(_2darray);
+	init_window(_2darray);
 	return (free_2d_array(_2darray), free(join_lines), 0);
 }
 
@@ -59,10 +59,10 @@ void f()
 
 int main(int ac, char **av)
 {
-	(void)ac;
+	(void)ac, (void)av;
 	// atexit(f);
-	if ((!av[1]) || ft_parsing(av[1]))
-		return (ft_putstr_fd("map not valid!\n", STDERR_FILENO), 1);
+	// if ((!av[1]) || ft_parsing(av[1]))
+	// 	return (ft_putstr_fd("map not valid!\n", STDERR_FILENO), 1);
 	printf("map valid!\n");
 	if (ft_start())
 		return (1);

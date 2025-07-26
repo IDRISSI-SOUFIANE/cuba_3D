@@ -2,6 +2,22 @@
 
 #include "../include/cub3d.h"
 
+// Helper function to get a pixel color from a texture image
+// This is crucial for sampling individual pixels from loaded textures
+unsigned int get_pixel_color(t_img *img, int x, int y)
+{
+	char	*pixel_addr;
+
+	// Check bounds to prevent reading outside the image data
+	// printf("img->width: %d | img->height: %d\n", img->width, img->height);
+	if (x < 0 || x >= img->width || y < 0 || y >= img->height)
+		return (0); // Return black or transparent for out-of-bounds access
+
+	// Calculate the memory address of the pixel
+	pixel_addr = img->addr + (y * img->line_len + x * (img->bpp / 8));
+	return (*(unsigned int *)pixel_addr);
+}
+
 void my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
 	char *dst;
@@ -15,11 +31,12 @@ void my_mlx_pixel_put(t_data *data, int x, int y, int color)
 	*(unsigned int *)dst = color;
 }
 
-// Draws a background tile (floor) at the given tile coordinates.
-void draw_background(t_data *data, int tile_x, int tile_y)
+// Draws a wall tile at the given tile coordinates.
+void	draw_wall(t_data *data, int tile_x, int tile_y)
 {
-	int x;
-	int y;
+	int				x;
+	int				y;
+	unsigned int	color;
 
 	y = 0;
 	while (y < TILE_SIZE)
@@ -27,18 +44,22 @@ void draw_background(t_data *data, int tile_x, int tile_y)
 		x = 0;
 		while (x < TILE_SIZE)
 		{
-			my_mlx_pixel_put(data, ((tile_x + x) - 1), ((tile_y + y) - 1), WHITE); // Floor color
+			// Get pixel color from the loaded wall texture
+            // We assume TILE_SIZE matches the texture's width/height for 1:1 mapping
+            color = get_pixel_color(&data->wall, x, y);
+			// Put this pixel onto the main image buffer at the correct screen position
+			my_mlx_pixel_put(data, tile_x + x, tile_y + y, color); // Wall color
 			x++;
 		}
 		y++;
 	}
 }
 
-// Draws a wall tile at the given tile coordinates.
-void draw_wall(t_data *data, int tile_x, int tile_y)
+// Draws a background tile (floor) at the given tile coordinates.
+void draw_background(t_data *data, int tile_x, int tile_y)
 {
-	int x;
-	int y;
+	int	x;
+	int	y;
 
 	y = 0;
 	while (y < TILE_SIZE)
@@ -46,7 +67,7 @@ void draw_wall(t_data *data, int tile_x, int tile_y)
 		x = 0;
 		while (x < TILE_SIZE)
 		{
-			my_mlx_pixel_put(data, tile_x + x, tile_y + y, BLACK); // Wall color
+			my_mlx_pixel_put(data, ((tile_x + x)), ((tile_y + y)), WHITE); // Floor color
 			x++;
 		}
 		y++;
@@ -55,8 +76,11 @@ void draw_wall(t_data *data, int tile_x, int tile_y)
 
 void draw(t_data *data, int i, int j)
 {
-	int tile_x = j * TILE_SIZE;
-	int tile_y = i * TILE_SIZE;
+	int tile_x;
+	int tile_y;
+	
+	tile_x = j * TILE_SIZE;
+	tile_y = i * TILE_SIZE;
 
 	draw_background(data, tile_x, tile_y);
 
@@ -104,8 +128,8 @@ void draw_player(t_data *data)
 // Renders the entire 2D map view.
 void render_map(t_data *data)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	while (data->map[i])
@@ -166,6 +190,8 @@ void handle_event(t_data *data)
 
 void cleanup(t_data *data)
 {
+	if (data->wall.img_ptr)
+		mlx_destroy_image(data->mlx_ptr, data->wall.img_ptr);
 	if (data->img.img_ptr)
 		mlx_destroy_image(data->mlx_ptr, data->img.img_ptr);
 	if (data->win_ptr)
@@ -238,12 +264,11 @@ void move_player(t_data *data)
 	}
 }
 
-// Initializes the t_data and t_player structures.
-// Now includes finding the player's initial position and direction from the map.
-void init_struct(t_data *data, char **map)
+// Initializes the t_data and t_player structures, and loads textures.
+void	init_struct(t_data *data, char **map)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	data->WIDTH = calculate_width(map);
 	data->HEIGHT = calculate_height(map);
@@ -267,23 +292,35 @@ void init_struct(t_data *data, char **map)
 		{
 			if (map[i][j] == 'N' || map[i][j] == 'S' || map[i][j] == 'E' || map[i][j] == 'W')
 			{
-				data->player.x = j + 0.1f; // Center of tile
-				data->player.y = i + 0.1f; // Center of tile
+				// Player position centered within the tile
+				data->player.x = j + 0.5f;
+				data->player.y = i + 0.5f;
 				if (map[i][j] == 'N')
 					data->player.rotationangle = 3 * M_PI / 2; // Facing North (up)
 				else if (map[i][j] == 'S')
-					data->player.rotationangle = M_PI / 2; // Facing South (down)
+					data->player.rotationangle = M_PI / 2;    // Facing South (down)
 				else if (map[i][j] == 'E')
-					data->player.rotationangle = 0; // Facing East (right)
+					data->player.rotationangle = 0;           // Facing East (right)
 				else if (map[i][j] == 'W')
-					data->player.rotationangle = M_PI; // Facing West (left)
-				// Assuming only one player character in the map
-				return;
+					data->player.rotationangle = M_PI;        // Facing West (left)
+				break; // Found player, no need to continue map scan for player pos
 			}
 			j++;
 		}
 		i++;
 	}
+
+	// Load the wall.xpm texture for 2D map rendering
+	data->wall.img_ptr = mlx_xpm_file_to_image(data->mlx_ptr, "texture/wall.xpm", &data->wall.width, &data->wall.height);
+	if (!data->wall.img_ptr)
+	{
+		ft_putstr_fd("Error: Failed to load wall.xpm texture for 2D map. Check path: ", STDERR_FILENO);
+		ft_putstr_fd("texture/wall.xpm", STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
+		cleanup(data);
+		exit(1);
+	}
+	data->wall.addr = mlx_get_data_addr(data->wall.img_ptr, &data->wall.bpp, &data->wall.line_len, &data->wall.endian);
 }
 
 // The main game loop, called repeatedly by MLX.
@@ -306,10 +343,10 @@ void init_window(char **map)
 
 	ft_memset(&data, 0, sizeof(t_data));
 	data.map = map;
-	init_struct(&data, map);
 	data.mlx_ptr = mlx_init();
 	if (!data.mlx_ptr)
 		exit(1);
+	init_struct(&data, map);
 	data.win_ptr = mlx_new_window(data.mlx_ptr, data.WIDTH, data.HEIGHT, "CUB3D");
 	if (!data.win_ptr)
 		return (cleanup(&data), exit(1));

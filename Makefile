@@ -1,5 +1,5 @@
 CC      = cc
-CFLAGS  = -Wall -Wextra -Werror #-fsanitize=address
+CFLAGS  = -Wall -Wextra -Werror -fsanitize=address
 RM      = rm -f
 
 FILES   = mandatory/cub3d.c mandatory/get_next_line.c \

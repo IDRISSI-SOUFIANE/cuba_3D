@@ -6,7 +6,7 @@
 /*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 17:21:16 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/07/22 10:37:48 by sidrissi         ###   ########.fr       */
+/*   Updated: 2025/07/26 15:09:10 by sidrissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,8 @@ typedef struct	s_img
 	int 	bpp;
 	int 	line_len;
 	int 	endian;
+	int		width;
+	int		height;
 }	t_img;
 
 typedef struct s_player {
@@ -92,6 +94,8 @@ typedef struct	s_data
 	int			HEIGHT;
 	char		**map;
 	t_img		img;
+	t_img		wall;
+	t_vmap		v_map;
 	t_player	player;
 }	t_data;
 
