@@ -6,7 +6,7 @@
 /*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 10:08:33 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/07/25 13:07:14 by sidrissi         ###   ########.fr       */
+/*   Updated: 2025/08/18 20:13:27 by sidrissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int ft_start()
 	if (!_2darray)
 		return (free(join_lines), 1);
 	init_window(_2darray);
+	printf("Freeing pointer %p in function %s\n", _2darray, __func__);
 	return (free_2d_array(_2darray), free(join_lines), 0);
 }
 

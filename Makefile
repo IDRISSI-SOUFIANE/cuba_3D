@@ -1,5 +1,5 @@
 CC      = cc
-CFLAGS  = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS  = -Wall -Wextra -Werror -g3 -fsanitize=address
 RM      = rm -f
 
 FILES   = mandatory/cub3d.c mandatory/get_next_line.c \
@@ -7,7 +7,8 @@ FILES   = mandatory/cub3d.c mandatory/get_next_line.c \
           libft/ft_putstr_fd.c libft/ft_strdup.c libft/ft_strjoin.c libft/ft_strlcpy.c \
           libft/ft_strlen.c libft/ft_substr.c libft/ft_strchr.c libft/ft_split.c libft/free_2d_array.c \
           libft/ft_memset.c libft/ft_atoi.c libft/ft_count_2d_array.c libft/ft_strcmp.c libft/ft_isdigit.c \
-		  libft/ft_strtrim.c libft/ft_lstnew.c libft/ft_lstaddback.c libft/ft_lstlast.c 
+		  libft/ft_strtrim.c libft/ft_lstnew.c libft/ft_lstaddback.c libft/ft_lstlast.c \
+		  recasting/recasting.c 
 
 OBJECT  = $(FILES:.c=.o)
 NAME    = Cub3d
