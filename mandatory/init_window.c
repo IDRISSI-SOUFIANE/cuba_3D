@@ -276,8 +276,8 @@ void	init_struct(t_data *data, char **map)
 	data->player.turndirection = 0;
 	data->player.walkdirection = 0;
 	data->player.rotationangle = 0; // Will be set based on player char
-	data->player.walkspeed = 2.5f;
-	data->player.turnspeed = 0.05f;
+	data->player.walkspeed = 3.5f;
+	data->player.turnspeed = 5 * (M_PI / 180) /*0.3f*/;
 
 	// Find player's initial position and set rotation angle
 	i = 0;
