@@ -6,7 +6,7 @@
 // This is crucial for sampling individual pixels from loaded textures
 unsigned int get_pixel_color(t_img *img, int x, int y)
 {
-	char	*pixel_addr;
+	char *pixel_addr;
 
 	// Check bounds to prevent reading outside the image data
 	// printf("img->width: %d | img->height: %d\n", img->width, img->height);
@@ -20,46 +20,44 @@ unsigned int get_pixel_color(t_img *img, int x, int y)
 
 void my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
-	char	*dst;
+	char *dst;
 
-	// Check if coordinates are within the window bounds 
+	// Check if coordinates are within the window bounds
 	if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
-		return ;
+		return;
 	// Calculate the memory address of the pixel
 	dst = data->img.addr + (y * data->img.line_len + x * (data->img.bpp / 8));
 	// Write the color to the pixel address
 	*(unsigned int *)dst = color;
 }
 
-// Draws a wall tile at the given tile coordinates.
-void	draw_wall(t_data *data, int tile_x, int tile_y)
-{
-	int				x;
-	int				y;
-	unsigned int	color;
 
-	y = 0;
-	while (y < TILE_SIZE)
-	{
-		x = 0;
-		while (x < TILE_SIZE)
-		{
-			// Get pixel color from the loaded wall texture
-			// We assume TILE_SIZE matches the texture's width/height for 1:1 mapping
-			color = get_pixel_color(&data->wall, x, y);
-			// Put this pixel onto the main image buffer at the correct screen position
-			my_mlx_pixel_put(data, tile_x + x, tile_y + y, color); // Wall color
-			x++;
-		}
-		y++;
-	}
+void draw_wall(t_data *data, int tile_x, int tile_y)
+{
+    int x;
+    int y;
+    unsigned int color;
+
+    y = 0;
+    while (y < TILE_SIZE)
+    {
+        x = 0;
+        while (x < TILE_SIZE)
+        {
+            color = get_pixel_color(&data->wall, x, y);
+            // The coordinates should be the sum of the tile position and the loop iterators
+            my_mlx_pixel_put(data, tile_x, tile_y, color); 
+            x++;
+        }
+        y++;
+    }
 }
 
 // Draws a background tile (floor) at the given tile coordinates.
-void	draw_background(t_data *data, int tile_x, int tile_y)
+void draw_background(t_data *data, int tile_x, int tile_y)
 {
-	int	x;
-	int	y;
+	int x;
+	int y;
 
 	x = 0;
 	while (x < TILE_SIZE)
@@ -74,11 +72,11 @@ void	draw_background(t_data *data, int tile_x, int tile_y)
 	}
 }
 
-void	draw(t_data *data, int i, int j)
+void draw(t_data *data, int i, int j)
 {
-	int	tile_x;
-	int	tile_y;
-	
+	int tile_x;
+	int tile_y;
+
 	tile_x = j * TILE_SIZE;
 	tile_y = i * TILE_SIZE;
 
@@ -92,10 +90,10 @@ void	draw(t_data *data, int i, int j)
 }
 
 // Renders the entire 2D map view.
-void	render_map(t_data *data)
+void render_map(t_data *data)
 {
-	int	i;
-	int	j;
+	int i;
+	int j;
 
 	i = 0;
 	while (data->map[i])
@@ -111,7 +109,7 @@ void	render_map(t_data *data)
 	// The player is drawn separately in game_loop after rendering the map.
 }
 
-void	draw_line(t_data *data, int x0, int y0, float angle, int length)
+void draw_line(t_data *data, int x0, int y0, float angle, int length)
 {
 	int i;
 	int x;
@@ -125,7 +123,7 @@ void	draw_line(t_data *data, int x0, int y0, float angle, int length)
 		y = y0 + sin(angle) * i;
 		// Draw the pixel if it's within bounds
 		if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
-			my_mlx_pixel_put(data, x, y, RED); // Player direction line color
+			my_mlx_pixel_put(data, x, y, GREEN); // Player direction line color
 		i++;
 	}
 }
@@ -135,16 +133,15 @@ void draw_player(t_data *data)
 {
 	// Convert player's world coordinates to screen coordinates for drawing
 	data->player.screen_x = (int)(data->player.x);
-	data->player.screen_y = (int)(data->player.y );
+	data->player.screen_y = (int)(data->player.y);
 
 	// Draw player direction line
 	draw_line(data,
 			  data->player.screen_x,
 			  data->player.screen_y,
 			  data->player.rotationangle,
-			  TILE_SIZE / 2);
+			  TILE_SIZE); // TILE_SIZE / 2
 }
-
 
 int key_press(int keycode, t_data *data)
 {
@@ -156,7 +153,7 @@ int key_press(int keycode, t_data *data)
 		data->player.turndirection = 1; // ->
 	else if (keycode == 123)
 		data->player.turndirection = -1; // <-
-	else if (keycode == 53)		// ESC
+	else if (keycode == 53)				 // ESC
 		(mlx_destroy_window(data->mlx_ptr, data->win_ptr), exit(0));
 	return (0);
 }
@@ -199,74 +196,81 @@ void cleanup(t_data *data)
 		mlx_destroy_window(data->mlx_ptr, data->win_ptr);
 }
 
-
-
-
 #include "../include/cub3d.h"
 
 // Check if a point is a wall
 int has_Wall_At(t_data *data, float x, float y)
 {
-    int mapGridIndexX;
-    int mapGridIndexY;
-    
-    // Check if the coordinates are within the map bounds
-    if (x < 0 || x > WIDTH* TILE_SIZE || y < 0 || y > HEIGHT * TILE_SIZE)
-        return 1; // Out of bounds is a wall
+	int mapGridIndexX;
+	int mapGridIndexY;
 
-    // Convert pixel coordinates to map grid coordinates
-    mapGridIndexX = floor(x / TILE_SIZE);
-    mapGridIndexY = floor(y / TILE_SIZE);
+	// Check if the coordinates are within the map bounds
+	if (x < 0 || x > WIDTH * TILE_SIZE || y < 0 || y > HEIGHT * TILE_SIZE)
+		return 1; // Out of bounds is a wall
 
-    // Check for wall
-    if (data->map[mapGridIndexY][mapGridIndexX] == '1')
-        return 1;
-    return 0;
+	// Convert pixel coordinates to map grid coordinates
+	mapGridIndexX = floor(x / TILE_SIZE);
+	mapGridIndexY = floor(y / TILE_SIZE);
+
+	// Check for wall
+	if (data->map[mapGridIndexY][mapGridIndexX] == '1')
+		return 1;
+	return 0;
 }
 
-
 // Moves the player based on input and handles basic collision detection.
-void	move_player(t_data *data)
+void move_player(t_data *data)
 {
-	float	move_step;
-	float	new_x;
-	float	new_y;
-	int		x;
-	int		y;
+	float move_step;
+	float new_x;
+	float new_y;
+	float player_radius;
 
 	// Update player rotation based on turn direction and speed
 	data->player.rotationangle += data->player.turndirection * data->player.turnspeed;
+	data->player.rotationangle = normalizeAngle(data->player.rotationangle);
 
 	// Calculate potential movement vector
-	move_step = data->player.walkdirection * data->player.walkspeed; // walkdierction [press key == 1 | relase key == 0]
+	move_step = data->player.walkdirection * data->player.walkspeed;
 	new_x = data->player.x + cos(data->player.rotationangle) * move_step;
 	new_y = data->player.y + sin(data->player.rotationangle) * move_step;
 
-	// Basic collision detection: Check if the new position is a wall
-	// Convert world coordinates to map grid coordinates for checking
-	x = (int)new_x / TILE_SIZE;
-	y = (int)new_y / TILE_SIZE;
+	// Use a small radius for collision detection to represent the player's bounding box
+	player_radius = TILE_SIZE / 12;
 
-	// foor check ---> printf("x: %d | y: %d\n", x,y);
-
-	// Ensure x and y are within map bounds
-	if (y >= 0 && y < HEIGHT &&
-		x >= 0 && x < WIDTH)
+	// Check for a wall at the new potential position. We check four points
+	// around the player's circumference to prevent them from passing through corners.
+	if (!has_wall_at(data, new_x + player_radius, new_y) &&
+		!has_wall_at(data, new_x - player_radius, new_y) &&
+		!has_wall_at(data, new_x, new_y + player_radius) &&
+		!has_wall_at(data, new_x, new_y - player_radius))
 	{
-		// Only update position if the new tile is not a wall ('1')
-		if (data->map[y][x] != '1')
-		{
-			data->player.x = new_x;
-			data->player.y = new_y;
-		}
+		data->player.x = new_x;
+		data->player.y = new_y;
 	}
+
+	/*
+		new_x + player_radius, new_y: The point to the right of the new position.
+
+		new_x - player_radius, new_y: The point to the left of the new position.
+
+		new_x, new_y + player_radius: The point below the new position.
+
+		new_x, new_y - player_radius: The point above the new position.
+
+		The player_radius value acts as a small buffer, representing the player's physical size.
+		By checking these four points, the code effectively creates a small box around the player's body.
+		If any one of these four points is about to move into a wall tile, the entire movement is canceled.
+		This ensures the player is correctly blocked before their bounding box can intersect with the wall's bounding box.
+		This method is far more robust and accurately simulates a solid object moving within the map, preventing the clipping issues you were experiencing.
+	*/
 }
 
 // Initializes the t_data and t_player structures, and loads textures.
-void	init_struct(t_data *data, char **map)
+void init_struct(t_data *data, char **map)
 {
-	int	i;
-	int	j;
+	int i;
+	int j;
 
 	data->player.x = 0;
 	data->player.y = 0;
@@ -295,52 +299,68 @@ void	init_struct(t_data *data, char **map)
 				if (map[i][j] == 'N')
 					data->player.rotationangle = 3 * M_PI / 2; // Facing North (up)
 				else if (map[i][j] == 'S')
-					data->player.rotationangle = M_PI / 2;    // Facing South (down)
+					data->player.rotationangle = M_PI / 2; // Facing South (down)
 				else if (map[i][j] == 'E')
-					data->player.rotationangle = 0;           // Facing East (right)
+					data->player.rotationangle = 0; // Facing East (right)
 				else if (map[i][j] == 'W')
-					data->player.rotationangle = M_PI;        // Facing West (left)
-				break; // Found player, no need to continue map scan for player pos
+					data->player.rotationangle = M_PI; // Facing West (left)
+				break;								   // Found player, no need to continue map scan for player pos
 			}
 			j++;
 		}
 		i++;
 	}
 
-	// Load the wall.xpm texture for 2D map rendering
-	data->wall.img_ptr = mlx_xpm_file_to_image(data->mlx_ptr, "texture/wall.xpm", &data->wall.width, &data->wall.height);
-	if (!data->wall.img_ptr)
-	{
-		ft_putstr_fd("Error: Failed to load wall.xpm texture for 2D map. Check path: ", STDERR_FILENO);
-		ft_putstr_fd("texture/wall.xpm", STDERR_FILENO);
-		ft_putstr_fd("\n", STDERR_FILENO);
-		cleanup(data);
-		exit(1);
-	}
-	data->wall.addr = mlx_get_data_addr(data->wall.img_ptr, &data->wall.bpp, &data->wall.line_len, &data->wall.endian);
+	// // Load the wall.xpm texture for 2D map rendering
+	// data->wall.img_ptr = mlx_xpm_file_to_image(data->mlx_ptr, "texture/wall.xpm", &data->wall.width, &data->wall.height);
+	// if (!data->wall.img_ptr)
+	// {
+	// 	ft_putstr_fd("Error: Failed to load wall.xpm texture for 2D map. Check path: ", STDERR_FILENO);
+	// 	ft_putstr_fd("texture/wall.xpm", STDERR_FILENO);
+	// 	ft_putstr_fd("\n", STDERR_FILENO);
+	// 	cleanup(data);
+	// 	exit(1);
+	// }
+	// data->wall.addr = mlx_get_data_addr(data->wall.img_ptr, &data->wall.bpp, &data->wall.line_len, &data->wall.endian);
 }
+
+// int game_loop(t_data *data)
+// {
+// 	// Update player position and rotation before rendering
+// 	move_player(data);
+
+// 	render_map(data);  // Draw the static map elements
+// 	draw_player(data); // Draw the player on top of the map
+
+// 	// NEW: Cast the rays from the player's position
+// 	castAllRays(data);
+
+// 	project_wall(data);
+
+// 	// Put the updated image to the window
+// 	mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->img.img_ptr, 0, 0); // why this line here?? what the purpose test
+// 	return (0);
+// }
+
+
+
 
 int game_loop(t_data *data)
 {
-    // Update player position and rotation before rendering
+    // Clear the image buffer for a clean slate each frame
+    ft_memset(data->img.addr, 0, WIDTH * HEIGHT * (data->img.bpp / 8));
+    
     move_player(data);
-
-    render_map(data);  // Draw the static map elements
-    draw_player(data); // Draw the player on top of the map
-
-    // NEW: Cast the rays from the player's position
     castAllRays(data);
+    project_wall(data);
 
-    // Put the updated image to the window
-    mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->img.img_ptr, 0, 0); // why this line here?? what the purpose test
+    mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->img.img_ptr, 0, 0); 
     return (0);
 }
 
-
-
-void	init_window(char **map)
+void init_window(char **map)
 {
-	t_data	data;
+	t_data data;
 
 	ft_memset(&data, 0, sizeof(t_data));
 	data.map = map;
@@ -355,69 +375,10 @@ void	init_window(char **map)
 	if (!data.img.img_ptr)
 		return (cleanup(&data), exit(1));
 	data.img.addr = mlx_get_data_addr(data.img.img_ptr, &data.img.bpp,
-									&data.img.line_len, &data.img.endian);
+									  &data.img.line_len, &data.img.endian);
 	if (!data.img.addr)
 		return (cleanup(&data), exit(1));
 	handle_event(&data);
 	mlx_loop_hook(data.mlx_ptr, game_loop, &data);
 	mlx_loop(data.mlx_ptr);
 }
-
-
-
-/*
-// The main game loop, called repeatedly by MLX.
-int game_loop(t_data *data)
-{
-	// Update player position and rotation before rendering
-	move_player(data);
-
-	render_map(data);  // Draw the static map elements
-	draw_player(data); // Draw the player on top of the map
-
-
-	// TODO:
-	castAllRays(data);
-
-	// Put the updated image to the window
-	mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->img.img_ptr, 0, 0);
-	return (0);
-}
-
-*/
-
-
-
-/*	I fix size so i don't need them 
-
-// Calculates the total width of the window based on the widest map row.
-int calculate_width(char **map)
-{
-	int max_width = 0;
-	int current_width;
-	int i = 0;
-
-	while (map[i])
-	{
-		current_width = 0;
-		while (map[i][current_width])
-			current_width++;
-		if (current_width > max_width)
-			max_width = current_width;
-		i++;
-	}
-	return (max_width * TILE_SIZE); // Return width in pixels
-}
-
-// Calculates the total height of the window based on the number of map rows.
-int calculate_height(char **map)
-{
-	int height;
-
-	height = 0;
-	while (map[height])
-		height++;
-	return (height * TILE_SIZE); // Return height in pixels
-}
-
-*/
