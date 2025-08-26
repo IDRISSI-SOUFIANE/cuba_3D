@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   recasting.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/19 16:18:42 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/08/21 16:49:35 by sidrissi         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "../include/cub3d.h"
 
@@ -91,10 +80,10 @@ int has_wall_at(t_data *data, float x, float y)
 	int mapGridIndexY = floor(y / TILE_SIZE);
 
 	if (mapGridIndexY < 0 || mapGridIndexY >= calculate_height(data->map))
-		return (printf("--------------------> enter ----------> here1\n"), 1);
+		return ( 1);
 
 	if (mapGridIndexX < 0 || mapGridIndexX >= (int)ft_strlen(data->map[mapGridIndexY]))
-		return (printf("--------------------> enter here\n"), 1) ;
+		return ( 1) ;
 
 	return (data->map[mapGridIndexY][mapGridIndexX] == '1');
 }
@@ -139,7 +128,7 @@ int	castRay(t_data *data, int columId, float rayAngle)
 	// printf("nextHorzTouchX: %f | nextHorzTouchY: %f\n", nextHorzTouchX, nextHorzTouchY);
 
 	if (data->rays[columId].isRayFacingUp)
-		nextHorzTouchY--;
+		nextHorzTouchY -=0.002;
 	
 	while (nextHorzTouchX >= 0 && nextHorzTouchX <= calculate_width(data->map) * TILE_SIZE
 			&& nextHorzTouchY >= 0 && nextHorzTouchY <= calculate_height(data->map) * TILE_SIZE)
@@ -182,7 +171,7 @@ int	castRay(t_data *data, int columId, float rayAngle)
 	float nextVerTouchY = yintercept;
 
 	if (data->rays[columId].isRayFacingLeft)
-		nextVerTouchX--;
+		nextVerTouchX-=0.002;
 
 	while (nextVerTouchX >= 0 && nextVerTouchX <= calculate_width(data->map) * TILE_SIZE
 			&& nextVerTouchY >= 0 && nextVerTouchY <= calculate_height(data->map) * TILE_SIZE)
@@ -246,18 +235,6 @@ void	castAllRays(t_data *data)
 		rayAngle = normalizeAngle(rayAngle);
 		castRay(data, i, rayAngle);
 		rayAngle += FOV_ANGLE / NUM_RAYS;
-		i++;
-	}
-
-	i = 0;
-	while (i < NUM_RAYS)
-	{
-		draw_line_re(data,
-			data->player.x, // data->player.screen_x
-			data->player.y, // data->player.screen_y
-			data->rays[i].wallHitX,
-			data->rays[i].wallHitY,
-			0xff0000);
 		i++;
 	}
 }

@@ -1,4 +1,4 @@
-/* khasni n hot fix map */
+/* khasni n  fix headerfile */
 
 #include "../include/cub3d.h"
 
@@ -32,11 +32,12 @@ void my_mlx_pixel_put(t_data *data, int x, int y, int color)
 }
 
 
+
 void draw_wall(t_data *data, int tile_x, int tile_y)
 {
     int x;
     int y;
-    unsigned int color;
+    // unsigned int color;
 
     y = 0;
     while (y < TILE_SIZE)
@@ -44,9 +45,9 @@ void draw_wall(t_data *data, int tile_x, int tile_y)
         x = 0;
         while (x < TILE_SIZE)
         {
-            color = get_pixel_color(&data->wall, x, y);
-            // The coordinates should be the sum of the tile position and the loop iterators
-            my_mlx_pixel_put(data, tile_x, tile_y, color); 
+            // Since you don't have texture loading working yet, 
+            // just use a solid color for walls
+            my_mlx_pixel_put(data, tile_x + x, tile_y + y, GREEN); 
             x++;
         }
         y++;
@@ -128,7 +129,7 @@ void draw_line(t_data *data, int x0, int y0, float angle, int length)
 	}
 }
 
-// Draws the player's representation (the red line) on the map.
+// // Draws the player's representation (the red line) on the map.
 void draw_player(t_data *data)
 {
 	// Convert player's world coordinates to screen coordinates for drawing
@@ -196,10 +197,9 @@ void cleanup(t_data *data)
 		mlx_destroy_window(data->mlx_ptr, data->win_ptr);
 }
 
-#include "../include/cub3d.h"
 
 // Check if a point is a wall
-int has_Wall_At(t_data *data, float x, float y)
+int has_wall_at_1337(t_data *data, float x, float y)
 {
 	int mapGridIndexX;
 	int mapGridIndexY;
@@ -240,10 +240,10 @@ void move_player(t_data *data)
 
 	// Check for a wall at the new potential position. We check four points
 	// around the player's circumference to prevent them from passing through corners.
-	if (!has_wall_at(data, new_x + player_radius, new_y) &&
-		!has_wall_at(data, new_x - player_radius, new_y) &&
-		!has_wall_at(data, new_x, new_y + player_radius) &&
-		!has_wall_at(data, new_x, new_y - player_radius))
+	if (!has_wall_at_1337(data, new_x + player_radius, new_y) &&
+		!has_wall_at_1337(data, new_x - player_radius, new_y) &&
+		!has_wall_at_1337(data, new_x, new_y + player_radius) &&
+		!has_wall_at_1337(data, new_x, new_y - player_radius))
 	{
 		data->player.x = new_x;
 		data->player.y = new_y;
@@ -311,74 +311,81 @@ void init_struct(t_data *data, char **map)
 		i++;
 	}
 
-	// // Load the wall.xpm texture for 2D map rendering
-	// data->wall.img_ptr = mlx_xpm_file_to_image(data->mlx_ptr, "texture/wall.xpm", &data->wall.width, &data->wall.height);
-	// if (!data->wall.img_ptr)
-	// {
-	// 	ft_putstr_fd("Error: Failed to load wall.xpm texture for 2D map. Check path: ", STDERR_FILENO);
-	// 	ft_putstr_fd("texture/wall.xpm", STDERR_FILENO);
-	// 	ft_putstr_fd("\n", STDERR_FILENO);
-	// 	cleanup(data);
-	// 	exit(1);
-	// }
-	// data->wall.addr = mlx_get_data_addr(data->wall.img_ptr, &data->wall.bpp, &data->wall.line_len, &data->wall.endian);
 }
-
-// int game_loop(t_data *data)
-// {
-// 	// Update player position and rotation before rendering
-// 	move_player(data);
-
-// 	render_map(data);  // Draw the static map elements
-// 	draw_player(data); // Draw the player on top of the map
-
-// 	// NEW: Cast the rays from the player's position
-// 	castAllRays(data);
-
-// 	project_wall(data);
-
-// 	// Put the updated image to the window
-// 	mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->img.img_ptr, 0, 0); // why this line here?? what the purpose test
-// 	return (0);
-// }
 
 
 
 
 int game_loop(t_data *data)
 {
-    // Clear the image buffer for a clean slate each frame
-    ft_memset(data->img.addr, 0, WIDTH * HEIGHT * (data->img.bpp / 8));
     
+    // Clear the image buffer
+    ft_memset(data->img.addr, 0, WIDTH * HEIGHT * (data->img.bpp / 8));
+
     move_player(data);
     castAllRays(data);
+    
     project_wall(data);
 
     mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->img.img_ptr, 0, 0); 
     return (0);
 }
 
-void init_window(char **map)
-{
-	t_data data;
 
-	ft_memset(&data, 0, sizeof(t_data));
-	data.map = map;
-	data.mlx_ptr = mlx_init();
-	if (!data.mlx_ptr)
+
+void init_window(char **map, t_data *data)
+{
+	
+	data->map = map;
+	data->mlx_ptr = mlx_init();
+	if (!data->mlx_ptr)
 		exit(1);
-	init_struct(&data, map);
-	data.win_ptr = mlx_new_window(data.mlx_ptr, WIDTH, HEIGHT, "CUB3D");
-	if (!data.win_ptr)
-		return (cleanup(&data), exit(1));
-	data.img.img_ptr = mlx_new_image(data.mlx_ptr, WIDTH, HEIGHT);
-	if (!data.img.img_ptr)
-		return (cleanup(&data), exit(1));
-	data.img.addr = mlx_get_data_addr(data.img.img_ptr, &data.img.bpp,
-									  &data.img.line_len, &data.img.endian);
-	if (!data.img.addr)
-		return (cleanup(&data), exit(1));
-	handle_event(&data);
-	mlx_loop_hook(data.mlx_ptr, game_loop, &data);
-	mlx_loop(data.mlx_ptr);
+	
+
+	init_struct(data, map);
+
+	printf("data->v_map.north ---> [%s]\n", data->v_map.north);
+	printf("data->v_map.south ---> [%s]\n", data->v_map.south);
+	printf("data->v_map.west ---> [%s]\n", data->v_map.west);
+	printf("data->v_map.east ---> [%s]\n", data->v_map.east);
+
+	// // Load wall textures before window/image creation
+    if (load_textures(data))
+    {
+        cleanup(data);
+        exit(1);
+    }
+
+
+	data->win_ptr = mlx_new_window(data->mlx_ptr, WIDTH, HEIGHT, "CUB3D");
+	if (!data->win_ptr)
+		return (cleanup(data), exit(1));
+	data->img.img_ptr = mlx_new_image(data->mlx_ptr, WIDTH, HEIGHT);
+	if (!data->img.img_ptr)
+		return (cleanup(data), exit(1));
+	data->img.addr = mlx_get_data_addr(data->img.img_ptr, &data->img.bpp,
+									  &data->img.line_len, &data->img.endian);
+	if (!data->img.addr)
+		return (cleanup(data), exit(1));
+	handle_event(data);
+	mlx_loop_hook(data->mlx_ptr, game_loop, data);
+	mlx_loop(data->mlx_ptr);
 }
+
+// int game_loop(t_data *data)
+// {
+//     // Clear the image buffer for a clean slate each frame
+//     ft_memset(data->img.addr, 0, WIDTH * HEIGHT * (data->img.bpp / 8));
+
+
+// 	// clear_window(data);
+
+//     move_player(data);
+//     castAllRays(data);
+// 	    debug_print_rays(data);
+
+//     project_wall(data);
+
+//     mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, data->img.img_ptr, 0, 0); 
+//     return (0);
+// }

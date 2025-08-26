@@ -6,7 +6,7 @@
 /*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 10:08:33 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/08/18 20:13:27 by sidrissi         ###   ########.fr       */
+/*   Updated: 2025/08/26 21:28:08 by sidrissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ char *_join_lines()
 	}
 	return (close(fd), res);
 }
-int ft_start()
+int ft_start(t_data *data)
 {
 	char *join_lines;
 	char **_2darray;
@@ -44,28 +44,10 @@ int ft_start()
 	_2darray = NULL;
 	join_lines = _join_lines();
 	if (!join_lines)
-		return (printf("map is empty\n"), 1);
+		return ( 1);
 	_2darray = ft_split(join_lines, "\n");
 	if (!_2darray)
 		return (free(join_lines), 1);
-	init_window(_2darray);
-	printf("Freeing pointer %p in function %s\n", _2darray, __func__);
+	init_window(_2darray, data);
 	return (free_2d_array(_2darray), free(join_lines), 0);
-}
-
-void f()
-{
-	system("leaks Cub3d");
-}
-
-int main(int ac, char **av)
-{
-	(void)ac, (void)av;
-	// atexit(f);
-	// if ((!av[1]) || ft_parsing(av[1]))
-	// 	return (ft_putstr_fd("map not valid!\n", STDERR_FILENO), 1);
-	printf("map valid!\n");
-	if (ft_start())
-		return (1);
-	return (0);
 }

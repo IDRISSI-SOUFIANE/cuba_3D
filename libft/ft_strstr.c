@@ -1,27 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memset.c                                        :+:      :+:    :+:   */
+/*   ft_strstr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/25 11:55:25 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/08/26 21:14:05 by sidrissi         ###   ########.fr       */
+/*   Created: 2025/08/25 15:15:54 by sidrissi          #+#    #+#             */
+/*   Updated: 2025/08/25 15:16:01 by sidrissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include  "../include/cub3d.h"
+#include "../include/cub3d.h"
 
-void	*ft_memset(void *b, int c, size_t len)
+char	*ft_strstr(char *str, char *to_find)
 {
-	unsigned char	*s;
-	unsigned char	cc;
+	int	i;
+	int	j;
 
-	s = (unsigned char *)b;
-	cc = (unsigned char)c;
-	while (len--)
+	i = 0;
+	j = 0;
+	if (to_find[j] == '\0')
 	{
-		s[len] = cc;
+		return (str);
 	}
-	return (b);
+	while (str[i] != '\0')
+	{
+		j = 0;
+		while ((str[i + j] == to_find[j] && to_find[j] != '\0'))
+		{
+			j++;
+		}
+		if (to_find[j] == '\0')
+		{
+			return (str + i);
+		}
+		i++;
+	}
+	return (NULL);
 }

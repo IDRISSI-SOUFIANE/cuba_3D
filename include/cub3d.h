@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   cub3d.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/21 17:21:16 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/08/21 16:46:49 by sidrissi         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 
 #ifndef CUB3D_H
@@ -26,10 +15,19 @@
 
 #define MLX_ERROR 1
 
-#define GREEN 0x00FF00
-#define BLACK 0x4d4d4d
-#define WHITE 0xFFFFFF
-#define RED 0XFF0000
+#define NORTH_COLOR 0x00FF0000 // Red
+#define SOUTH_COLOR 0x0000FF00 // Green
+#define WEST_COLOR  0x000000FF // Blue
+#define EAST_COLOR  0x00FFFF00 // Yellow
+#define CEILING_COLOR 0x0087CEEB // Light Sky Blue
+#define FLOOR_COLOR 0x00808080 // Grey
+
+#define RED 0x00FF0000
+#define GREEN 0x0000FF00
+#define WHITE 0xFF0000
+#define BLUE 0x000000FF
+#define BLACK 0x00000000
+
 
 #define TILE_SIZE 32
 
@@ -37,7 +35,7 @@
 #define WIDTH 1000
 #define HEIGHT 1200
 #define FOV_ANGLE 60 * (M_PI / 180)
-#define NUM_RAYS WIDTH // The number of rays should correspond to the screen width
+#define NUM_RAYS (WIDTH) // The number of rays should correspond to the screen width
 
 #define WALL_STRIP_WIDTH 1
 // #define NUM_RAYS WIDTH / WALL_STRIP_WIDTH // The number of rays should correspond to the screen width
@@ -52,24 +50,7 @@
 #include <string.h>
 #include <float.h>
 
-/*============= Parsing ===================*/
 
-typedef struct s_vmap
-{
-	char *path;
-	char *str;
-	char *color;
-	char *north;
-	char *south;
-	char *west;
-	char *east;
-	char *floor;
-	char *ceil;
-	int n_floor;
-	int n_ceil;
-} t_vmap;
-
-/*============= Parsing ===================*/
 
 /*============= Execution ===================*/
 
@@ -111,6 +92,34 @@ typedef struct s_player
 	float turnspeed;
 } t_player;
 
+
+/*============= Parsing ===================*/
+
+typedef struct s_vmap
+{
+	char *path;
+	char *str;
+	char *color;
+	char *north;
+	char *south;
+	char *west;
+	char *east;
+	char *floor;
+	char *ceil;
+	int n_floor;
+	int n_ceil;
+
+	// second_map
+	char	*_join_map_lines;// should free()
+
+	 // **NEW:** Add a struct for each texture image
+	t_img	north_img;
+	t_img	south_img;
+	t_img	west_img;
+	t_img	east_img;
+}	t_vmap;
+
+
 typedef struct s_data
 {
 	void *win_ptr;
@@ -124,6 +133,9 @@ typedef struct s_data
 	t_player player;
 	t_ray rays[NUM_RAYS];
 } t_data;
+
+
+/*============= Parsing ===================*/
 
 /*============= Execution ===================*/
 
@@ -151,19 +163,18 @@ int		ft_strcmp(char *s1, char *s2);
 long	ft_atoi(char *str);
 int		ft_isdigit(int c);
 char 	*ft_strtrim(char *s1, char *set);
-t_vmap	*ft_lstnew(char *path);
-void	ft_lstadd_back(t_vmap **lst, t_vmap *new);
-t_vmap 	ft_lstlast(t_vmap *lst);
+char	*ft_strtrim_end(char *s1, char *set);
+char	*ft_strstr(char *str, char *to_find);
 /*=============libft (End)============================*/
 
 /*=============Parsing (End)============================*/
-int		ft_parsing(char *map);
+int ft_parsing(char *map, t_vmap *v_map);
 int		check_extention(char *map);
-int		check_first_part(int fd, int count);
+int check_first_part(int fd, int count, t_vmap *v_map);
 /*=============Parsing (Start)============================*/
 
 /*=============start_drawing (Start)============================*/
-void	init_window(char **map);
+void init_window(char **map, t_data *data);
 void	draw_ray(t_data *data, int x0, int y0, int x1, int y1);
 /*=============start_drawing (End)============================*/
 
@@ -180,5 +191,11 @@ int		has_wall_at(t_data *data, float x, float y);
 void	project_wall(t_data *data);
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
 /*============= Recasting (End)============================*/
+
+
+int		load_textures(t_data *data);
+unsigned int get_pixel_color(t_img *img, int x, int y);
+int has_wall_at_1337(t_data *data, float x, float y);
+int ft_start(t_data *data);
 
 #endif

@@ -1,27 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memset.c                                        :+:      :+:    :+:   */
+/*   ft_strtrim_end.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/25 11:55:25 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/08/26 21:14:05 by sidrissi         ###   ########.fr       */
+/*   Created: 2025/08/25 15:14:42 by sidrissi          #+#    #+#             */
+/*   Updated: 2025/08/25 15:14:43 by sidrissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include  "../include/cub3d.h"
+#include "../include/cub3d.h"
 
-void	*ft_memset(void *b, int c, size_t len)
+char	*ft_strtrim_end(char *s1, char *set)
 {
-	unsigned char	*s;
-	unsigned char	cc;
+	int end;
 
-	s = (unsigned char *)b;
-	cc = (unsigned char)c;
-	while (len--)
+	if (!s1 || !set)
+		return (NULL);
+	end = ft_strlen(s1) - 1;
+	while (end >= 0 && s1[end] == ' ')
 	{
-		s[len] = cc;
+		end--;
 	}
-	return (b);
+	return (ft_substr(s1, 0, end + 1));
 }

@@ -37,10 +37,10 @@ int has_wall_at(t_data *data, float x, float y)
 	int mapGridIndexY = floor(y / TILE_SIZE);
 
 	if (mapGridIndexY < 0 || mapGridIndexY >= calculate_height(data->map))
-		return (printf("--------------------> enter ----------> here1\n"), 1);
+		return (1);
 
 	if (mapGridIndexX < 0 || mapGridIndexX >= (int)ft_strlen(data->map[mapGridIndexY]))
-		return (printf("--------------------> enter here\n"), 1) ;
+		return ( 1) ;
 
 	return (data->map[mapGridIndexY][mapGridIndexX] == '1');
 }
@@ -238,14 +238,11 @@ void    castRay(t_data *data, int columId, float rayAngle)
 	vertical_distance = find_vertical_intersection(data, columId, rayAngle, horizontal_distance);
 
 
-	// printf("horizontal_distance : %f  | vertical_distance: %f\n", horizontal_distance , vertical_distance);
-
 	if (horizontal_distance < vertical_distance)
 	{
 		data->rays[columId].distance = horizontal_distance;
 		data->rays[columId].wasHitVertical = 0;
-		
-		// printf("horizantale->take the last distance: %f   %f\n", data->rays[columId].wallHitX, data->rays[columId].wallHitY);
+
 		// Draw the ray on the 2D map using the new draw_ray function
 		draw_ray(data, data->player.x, data->player.y, data->rays[columId].wallHitX, data->rays[columId].wallHitY);
 	}
@@ -253,7 +250,6 @@ void    castRay(t_data *data, int columId, float rayAngle)
 	{
 		data->rays[columId].distance = vertical_distance;
 		data->rays[columId].wasHitVertical = 1;
-		// printf("vertical->take the last distance: %f   %f\n", data->rays[columId].wallHitX, data->rays[columId].wallHitY);
 		// Draw the ray on the 2D map using the new draw_ray function
 		draw_ray(data, data->player.x, data->player.y, data->rays[columId].wallHitX, data->rays[columId].wallHitY);
 	}
