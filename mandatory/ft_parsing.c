@@ -43,7 +43,7 @@ int check_map_line(char *line, int fd, int *flag)
 		while (line[i])
 		{
 			if (ft_0_1_map(line[i]) && line[i] != ' ' && line[i] != '\n' && p_player(line[i]))
-				return (/*printf("check_map_line() : %s \n", line),*/ 1337);
+				return (printf("check_map_line() : %s \n", line), 1337);
 			i++;
 		}
 	}
@@ -82,7 +82,7 @@ static char *process_remaining_lines(char *temp, int fd, int *flag)
 	return (temp);
 }
 
-int store_map(t_vmap *v_map, char *line, int fd, int *flag)
+int store_map(t_data *data, char *line, int fd, int *flag)
 {
 	char *_line_;
 	char *temp;
@@ -105,11 +105,11 @@ int store_map(t_vmap *v_map, char *line, int fd, int *flag)
 	temp = process_remaining_lines(temp, fd, flag);
 	if (!temp)
 		return (1337);
-	v_map->_join_map_lines = temp;
+	data->v_map._join_map_lines = temp;
 	return (close(fd), 0);
 }
 
-int second_map(t_vmap *v_map)
+int second_map(t_data *data)
 {
 	int fd;
 	char *line;
@@ -123,7 +123,9 @@ int second_map(t_vmap *v_map)
 	count = 0;
 	while (((line = get_next_line(fd)) != NULL) && count < 6)
 	{
-		if (ft_strstr(line, v_map->ceil) || ft_strstr(line, v_map->floor) || ft_strstr(line, v_map->north) || ft_strstr(line, v_map->south) || ft_strstr(line, v_map->west) || ft_strstr(line, v_map->east))
+		if (ft_strstr(line, data->v_map.ceil) || ft_strstr(line, data->v_map.floor)
+			|| ft_strstr(line, data->v_map.north) || ft_strstr(line, data->v_map.south)
+			|| ft_strstr(line, data->v_map.west) || ft_strstr(line, data->v_map.east))
 			(count++, free(line));
 		else
 			free(line);
@@ -131,7 +133,7 @@ int second_map(t_vmap *v_map)
 	if (NULL == line)
 		return (1337);
 	// we reach to first line of map
-	if (store_map(v_map, line, fd, &flag))
+	if (store_map(data, line, fd, &flag))
 		return (1337);
 	// free(line); //free line in store_map() function
 	return (close(fd), 0);
@@ -211,7 +213,7 @@ int check_res(char **res)
 	return (0);
 }
 
-int check_number(char *color, char *path, t_vmap *v_map)
+int check_number(char *color, char *path, t_data *data)
 {
 	char **res;
 	int r;
@@ -230,9 +232,9 @@ int check_number(char *color, char *path, t_vmap *v_map)
 	if ((r < 0 || r > 255) || (g < 0 || g > 255) || (b < 0 || b > 255))
 		return (free_2d_array(res), 1337);
 	if (!ft_strcmp(color, "F "))
-		v_map->n_floor = (r << 16 | g << 8 | b << 0);
+		data->v_map.n_floor = (r << 16 | g << 8 | b << 0);
 	else if (!ft_strcmp(color, "C "))
-		v_map->n_ceil = (r << 16 | g << 8 | b << 0);
+		data->v_map.n_ceil = (r << 16 | g << 8 | b << 0);
 	;
 
 	return (free_2d_array(res), 0);
@@ -258,11 +260,11 @@ int check_comma(char *path)
 	return (0);
 }
 
-int check_v_color(char *color, char *path, t_vmap *v_map)
+int check_v_color(char *color, char *path, t_data *data)
 {
 	if (!ft_strcmp(color, "F ") || !ft_strcmp(color, "C "))
 	{
-		if (check_comma(path) || check_number(color, path, v_map))
+		if (check_comma(path) || check_number(color, path, data))
 			return (1337);
 	}
 	return (0);
@@ -271,9 +273,6 @@ int check_v_color(char *color, char *path, t_vmap *v_map)
 int check_v_path(char *str, char *path)
 {
 	int fd;
-
-	// printf("path: '%s'\n", path);
-	// printf("str: '%s'\n", str);
 
 	if (!ft_strcmp(str, "NO ") || !ft_strcmp(str, "SO ") || !ft_strcmp(str, "WE ") || !ft_strcmp(str, "EA "))
 	{
@@ -305,20 +304,20 @@ int index_end(char *line)
 	return (start);
 }
 
-static int assign_and_check_attribute(t_vmap *v_map, char *path, int *count)
+static int assign_and_check_attribute(t_data *data, char *path, int *count)
 {
-	if (!ft_strcmp(v_map->str, "NO ") && !v_map->north)
-		v_map->north = path;
-	else if (!ft_strcmp(v_map->str, "SO ") && !v_map->south)
-		v_map->south = path;
-	else if (!ft_strcmp(v_map->str, "WE ") && !v_map->west)
-		v_map->west = path;
-	else if (!ft_strcmp(v_map->str, "EA ") && !v_map->east)
-		v_map->east = path;
-	else if (!ft_strcmp(v_map->color, "F ") && !v_map->floor)
-		v_map->floor = path;
-	else if (!ft_strcmp(v_map->color, "C ") && !v_map->ceil)
-		v_map->ceil = path;
+	if (!ft_strcmp(data->v_map.str, "NO ") && !data->v_map.north)
+
+		data->v_map.north = path;
+	else if (!ft_strcmp(data->v_map.str, "SO ") && !data->v_map.south)
+		data->v_map.south = path;	else if (!ft_strcmp(data->v_map.str, "WE ") && !data->v_map.west)
+		data->v_map.west = path;
+	else if (!ft_strcmp(data->v_map.str, "EA ") && !data->v_map.east)
+		data->v_map.east = path;
+	else if (!ft_strcmp(data->v_map.color, "F ") && !data->v_map.floor)
+		data->v_map.floor = path;
+	else if (!ft_strcmp(data->v_map.color, "C ") && !data->v_map.ceil)
+		data->v_map.ceil = path;
 	else
 		return (0); // No attribute assigned
 	(*count)++;
@@ -344,56 +343,57 @@ static char *get_and_validate_path(char *line)
 	return (path);
 }
 
-int check_dublicate(t_vmap *v_map, char *line, int *count)
+int check_dublicate(t_data *data, char *line, int *count)
 {
 	char *path;
 	int assigned;
 
 	if (!ft_strcmp(line, "\0"))
 		return (*count);
-	if (ft_strcmp(v_map->str, "NO ") && ft_strcmp(v_map->str, "SO ") &&
-		ft_strcmp(v_map->str, "WE ") && ft_strcmp(v_map->str, "EA ") &&
-		ft_strcmp(v_map->color, "F ") && ft_strcmp(v_map->color, "C "))
+	if (ft_strcmp(data->v_map.str, "NO ") && ft_strcmp(data->v_map.str, "SO ") &&
+		ft_strcmp(data->v_map.str, "WE ") && ft_strcmp(data->v_map.str, "EA ") &&
+		ft_strcmp(data->v_map.color, "F ") && ft_strcmp(data->v_map.color, "C "))
 		return (1337);
 	path = get_and_validate_path(line);
 	if (!path)
 		return (1337);
-	assigned = assign_and_check_attribute(v_map, path, count);
+	assigned = assign_and_check_attribute(data, path, count);
 	if (!assigned)
 	{
+		printf("assigned : %d\n", assigned);
 		ft_putstr_fd("path not correct\n", 2);
 		free(path);
 		return (1337);
 	}
-	if (check_v_path(v_map->str, path) || check_v_color(v_map->color, path, v_map))
+	if (check_v_path(data->v_map.str, path) || check_v_color(data->v_map.color, path, data))
 		return (1337);
 
 	// Note: 'path' is now owned by `v_map`, so it should not be freed here.
 	return (*count);
 }
 
-int check_direction(t_vmap *v_map, char *line, int *count)
+int check_direction(t_data *data, char *line, int *count)
 {
-	if (check_dublicate(v_map, line, count) == 1337)
+	if (check_dublicate(data, line, count) == 1337)
 		return (1337);
 	return (*(count));
 }
 
-int check_line(t_vmap *v_map, char *line, int *count)
+int	check_line(t_data *data, char *line, int *count)
 {
 	int check;
 	char *new_line;
 
 	new_line = ft_strtrim(line, " ");
-	v_map->str = get_word(line, 3);
-	v_map->color = get_word(line, 2);
-	if ((NULL == v_map->str) || (NULL == v_map->color))
+	data->v_map.str = get_word(line, 3);
+	data->v_map.color = get_word(line, 2);
+	if ((NULL == data->v_map.str) || (NULL == data->v_map.color))
 		return (1337);
-	check = check_direction(v_map, new_line, count);
+	check = check_direction(data, new_line, count);
 	free(new_line);
 	if (check == 1337)
-		return (free(v_map->str), free(v_map->color), 1337);
-	return (free(v_map->str), free(v_map->color), *(count));
+		return (free(data->v_map.str), free(data->v_map.color), 1337);
+	return (free(data->v_map.str), free(data->v_map.color), *(count));
 }
 
 void free_v_map(t_vmap *v_map)
@@ -412,12 +412,12 @@ void free_v_map(t_vmap *v_map)
 		free(v_map->ceil);
 }
 
-int check_first_part(int fd, int count, t_vmap *v_map)
+int check_first_part(int fd, int count, t_data *data)
 {
 
-	char *line;
-	int n_count;
-	char *new_line;
+	char	*line;
+	int		n_count;
+	char	*new_line;
 
 	n_count = 0;
 	fd = open("map/map.cub", O_RDONLY);
@@ -428,7 +428,7 @@ int check_first_part(int fd, int count, t_vmap *v_map)
 		if (ft_strcmp(line, "\n"))
 		{
 			new_line = ft_strtrim(line, "\n");
-			n_count = check_line(v_map, new_line, &count);
+			n_count = check_line(data, new_line, &count);
 			if (n_count == 1337)
 				return (free(line), free(new_line), 1337);
 			(free(line), free(new_line));
@@ -472,6 +472,7 @@ int found_player(char **_2darray)
 
 char **check_map(char *join_map_lines)
 {
+	// printf();
 	char **_2darray;
 	_2darray = ft_split(join_map_lines, "\n");
 	if (!_2darray)
@@ -491,7 +492,7 @@ char **check_map(char *join_map_lines)
 
 
 
-int ft_parsing(char *map, t_vmap *v_map)
+int ft_parsing(char *map, t_data *data)
 {
 	int fd;
 	int count;
@@ -501,14 +502,14 @@ int ft_parsing(char *map, t_vmap *v_map)
 	count = 0;
 	if (check_extention(map))
 		return (1);
-	if (check_first_part(fd, count, v_map) || second_map(v_map))
-		return (free_v_map(v_map), free(v_map->_join_map_lines), 1); // remove it when finish
+	if (check_first_part(fd, count, data) || second_map(data))
+		return (free_v_map(&data->v_map), free(data->v_map._join_map_lines), 1); // remove it when finish
 
 
 
 	/*==================================================================*/
 
-		printf("->v_map->north)[%s]\n", v_map->north);
+		printf("(-----> ::: v_map->north)[%s]\n", data->v_map.north);
 
 	/*==================================================================*/
 
@@ -521,34 +522,33 @@ int ft_parsing(char *map, t_vmap *v_map)
 void f()
 {
 	system("leaks Cub3d");
+	// system("lsof -c Cub3d");
 }
 
 int main(int ac, char **av)
 {
+	atexit(f);
 	(void)ac;
 	char **maps;
-	t_vmap v_map;
+	// t_vmap v_map;
 	t_data data;
 
-	// ft_memset(&v_map, 0, sizeof(v_map));
 	ft_memset(&data, 0, sizeof(t_data));
 	// atexit(f);
 
-	if ((!av[1]) || ft_parsing(av[1], &v_map))
+	if ((!av[1]) || ft_parsing(av[1], &data))
 		return (ft_putstr_fd("map not valid!\n", STDERR_FILENO), 1);
 
-
-	maps = check_map(v_map._join_map_lines);
+	maps = check_map(data.v_map._join_map_lines);
 	if (NULL == maps)
-		return (free_v_map(&v_map), free(v_map._join_map_lines), 1337);
+		return (printf("here\n"), free_v_map(&data.v_map), free(data.v_map._join_map_lines), 1337);
 
-	data.v_map = v_map;
-
-	if (ft_start(&data)) // ft_start(maps, &v_map)
+	// data.map = maps;
+	if (ft_start(&data)) // ft_start(&data, maps)
 		return (1);
 
-	free_v_map(&v_map);
-	free(v_map._join_map_lines);
+	free_v_map(&data.v_map);
+	free(data.v_map._join_map_lines);
 	free_2d_array(maps);
 	
 	return (0);

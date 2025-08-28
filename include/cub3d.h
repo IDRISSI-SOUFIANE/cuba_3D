@@ -82,8 +82,8 @@ typedef struct s_player
 {
 	float x;
 	float y;
-	int screen_x;
-	int screen_y;
+	// int screen_x;
+	// int screen_y;
 	float radius;
 	float turndirection;
 	float walkdirection;
@@ -168,13 +168,13 @@ char	*ft_strstr(char *str, char *to_find);
 /*=============libft (End)============================*/
 
 /*=============Parsing (End)============================*/
-int ft_parsing(char *map, t_vmap *v_map);
+int ft_parsing(char *map, t_data *data);
 int		check_extention(char *map);
-int check_first_part(int fd, int count, t_vmap *v_map);
+int check_first_part(int fd, int count, t_data *data);
 /*=============Parsing (Start)============================*/
 
 /*=============start_drawing (Start)============================*/
-void init_window(char **map, t_data *data);
+int		init_window(char **map, t_data *data);
 void	draw_ray(t_data *data, int x0, int y0, int x1, int y1);
 /*=============start_drawing (End)============================*/
 

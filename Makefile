@@ -84,7 +84,7 @@
 
 
 CC      = cc
-CFLAGS  = -Wall -Wextra -Werror -fsanitize=address -g3
+CFLAGS  = -Wall -Wextra -Werror #-fsanitize=address -g3
 RM      = rm -f
 FILES	= mandatory/cub3d.c mandatory/get_next_line.c  mandatory/ft_parsing.c mandatory/init_window.c\
 			libft/ft_putstr_fd.c libft/ft_strdup.c libft/ft_strjoin.c libft/ft_strlcpy.c \

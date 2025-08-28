@@ -583,7 +583,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-int load_textures(t_data *data)
+int	load_textures(t_data *data)
 {
 	// Load XPM images into the t_img structs (width/height will be set by mlx)
 	data->v_map.east_img.img_ptr = mlx_xpm_file_to_image(data->mlx_ptr, data->v_map.east, &data->v_map.east_img.width, &data->v_map.east_img.height);
@@ -737,7 +737,7 @@ void project_wall(t_data *data)
 		int y = 0;
 		while (y < wallTopPixel)
 		{
-			my_mlx_pixel_put(data, i, y, CEILING_COLOR);
+			my_mlx_pixel_put(data, i, y, data->v_map.n_ceil);
 			y++;
 		}
 
@@ -788,7 +788,7 @@ void project_wall(t_data *data)
 		// --- 9) draw floor
 		while (y < HEIGHT)
 		{
-			my_mlx_pixel_put(data, i, y, FLOOR_COLOR);
+			my_mlx_pixel_put(data, i, y, data->v_map.n_floor);
 			y++;
 		}
 
