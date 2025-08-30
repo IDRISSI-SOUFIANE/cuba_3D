@@ -81,31 +81,31 @@ void my_mlx_pixel_put(t_data *data, int x, int y, int color)
 
 // 	draw_background(data, tile_x, tile_y);
 
-// 	if (data->map[i][j] == '1')
+// 	if (data->data->map[i][j] == '1')
 // 	{
 // 		draw_wall(data, tile_x, tile_y);
 // 	}
 // 	// Player 'N' character is used for initial position, but not for drawing here.
 // }
 
-// // Renders the entire 2D map view.
-// void render_map(t_data *data)
+// // Renders the entire 2D data->map view.
+// void render_data->map(t_data *data)
 // {
 // 	int i;
 // 	int j;
 
 // 	i = 0;
-// 	while (data->map[i])
+// 	while (data->data->map[i])
 // 	{
 // 		j = 0;
-// 		while (data->map[i][j])
+// 		while (data->data->map[i][j])
 // 		{
 // 			draw(data, i, j); // Draw each tile
 // 			j++;
 // 		}
 // 		i++;
 // 	}
-// 	// The player is drawn separately in game_loop after rendering the map.
+// 	// The player is drawn separately in game_loop after rendering the data->map.
 // }
 
 // void draw_line(t_data *data, int x0, int y0, float angle, int length)
@@ -127,7 +127,7 @@ void my_mlx_pixel_put(t_data *data, int x, int y, int color)
 // 	}
 // }
 
-// // // Draws the player's representation (the red line) on the map.
+// // // Draws the player's representation (the red line) on the data->map.
 // void draw_player(t_data *data)
 // {
 // 	// Convert player's world coordinates to screen coordinates for drawing
@@ -203,11 +203,11 @@ int has_wall_at_1337(t_data *data, float x, float y)
 	int mapGridIndexX;
 	int mapGridIndexY;
 
-	// Check if the coordinates are within the map bounds
+	// Check if the coordinates are within the data->map bounds
 	if (x < 0 || x > WIDTH * TILE_SIZE || y < 0 || y > HEIGHT * TILE_SIZE)
 		return 1; // Out of bounds is a wall
 
-	// Convert pixel coordinates to map grid coordinates
+	// Convert pixel coordinates to data->map grid coordinates
 	mapGridIndexX = floor(x / TILE_SIZE);
 	mapGridIndexY = floor(y / TILE_SIZE);
 
@@ -266,12 +266,12 @@ void move_player(t_data *data)
 		By checking these four points, the code effectively creates a small box around the player's body.
 		If any one of these four points is about to move into a wall tile, the entire movement is canceled.
 		This ensures the player is correctly blocked before their bounding box can intersect with the wall's bounding box.
-		This method is far more robust and accurately simulates a solid object moving within the map, preventing the clipping issues you were experiencing.
+		This method is far more robust and accurately simulates a solid object moving within the data->map, preventing the clipping issues you were experiencing.
 	*/
 }
 
 // Initializes the t_data and t_player structures, and loads textures.
-void init_struct(t_data *data, char **map)
+void init_struct(t_data *data)
 {
 	int i;
 	int j;
@@ -289,26 +289,26 @@ void init_struct(t_data *data, char **map)
 
 	// Find player's initial position and set rotation angle
 	i = 0;
-	while (map[i])
+	while (data->map[i])
 	{
 		j = 0;
-		while (map[i][j])
+		while (data->map[i][j])
 		{
-			if (map[i][j] == 'N' || map[i][j] == 'S' || map[i][j] == 'E' || map[i][j] == 'W')
+			if (data->map[i][j] == 'N' || data->map[i][j] == 'S' || data->map[i][j] == 'E' || data->map[i][j] == 'W')
 			{
 				// Player position centered within the tile
 				data->player.x = (j + 0.5f) * TILE_SIZE;
 				data->player.y = (i + 0.5f) * TILE_SIZE;
 				/*foor check --->*/ printf("data->player.x: %f | data->player.y : %f\n", data->player.x, data->player.y);
-				if (map[i][j] == 'N')
+				if (data->map[i][j] == 'N')
 					data->player.rotationangle = 3 * M_PI / 2; // Facing North (up)
-				else if (map[i][j] == 'S')
+				else if (data->map[i][j] == 'S')
 					data->player.rotationangle = M_PI / 2; // Facing South (down)
-				else if (map[i][j] == 'E')
+				else if (data->map[i][j] == 'E')
 					data->player.rotationangle = 0; // Facing East (right)
-				else if (map[i][j] == 'W')
+				else if (data->map[i][j] == 'W')
 					data->player.rotationangle = M_PI; // Facing West (left)
-				break;								   // Found player, no need to continue map scan for player pos
+				break;								   // Found player, no need to continue data->map scan for player pos
 			}
 			j++;
 		}
@@ -327,15 +327,14 @@ int game_loop(t_data *data)
 	return (0);
 }
 
-int init_window(char **map, t_data *data)
+int init_window(t_data *data)
 {
-	data->map = map;
 	data->mlx_ptr = mlx_init();
 	if ((WIDTH > 8192 || HEIGHT > 8192) || (WIDTH <= 0 || HEIGHT <= 0))
 		return (ft_putstr_fd("window not correct\n", STDERR_FILENO), 1337); // check leaks!!
 	if (!data->mlx_ptr)
 		exit(1);
-	init_struct(data, map);
+	init_struct(data);
 	if (load_textures(data))
 		(cleanup(data), exit(1));
 	data->win_ptr = mlx_new_window(data->mlx_ptr, WIDTH, HEIGHT, "CUB3D");

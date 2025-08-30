@@ -174,7 +174,7 @@ int check_first_part(int fd, int count, t_data *data);
 /*=============Parsing (Start)============================*/
 
 /*=============start_drawing (Start)============================*/
-int		init_window(char **map, t_data *data);
+int		init_window(t_data *data);
 void	draw_ray(t_data *data, int x0, int y0, int x1, int y1);
 /*=============start_drawing (End)============================*/
 

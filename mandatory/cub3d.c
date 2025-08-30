@@ -6,7 +6,7 @@
 /*   By: sidrissi <sidrissi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 10:08:33 by sidrissi          #+#    #+#             */
-/*   Updated: 2025/08/27 11:33:30 by sidrissi         ###   ########.fr       */
+/*   Updated: 2025/08/30 15:02:57 by sidrissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,16 +39,14 @@ char *_join_lines()
 int ft_start(t_data *data)
 {
 	char *join_lines;
-	char **_2darray;
 
-	_2darray = NULL;
 	join_lines = _join_lines();
 	if (!join_lines)
 		return (1);
-	_2darray = ft_split(join_lines, "\n");
-	if (!_2darray)
+	data->map = ft_split(join_lines, "\n");
+	if (!data->map)
 		return (free(join_lines), 1);
-	if (init_window(_2darray, data))
+	if (init_window(data))
 		return (1337);
-	return (free_2d_array(_2darray), free(join_lines), 0);
+	return (free_2d_array(data->map), free(join_lines), 0);
 }

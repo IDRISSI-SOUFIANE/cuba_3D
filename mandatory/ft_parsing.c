@@ -517,6 +517,174 @@ int ft_parsing(char *map, t_data *data)
 	return (0);
 }
 
+/*==================================================================*/
+
+int chick_all_line(char *str)
+{
+	int i =0;
+	int  j = 0;
+
+	while(str[i])
+	{
+
+		if(str[i] == ' ')
+		{
+			i++;
+			j++;
+		}
+		if( i > 1 && str[i] != '1'  && str[i - 1] != ' ' && str[i] != '\n')
+		{
+			return 0;
+		}
+		if(str[i] == ' ')
+		{
+			j++;
+		}
+		i++;
+	}
+	return 1 ;
+} 
+
+int ft_tchklast_laine( char *line,char *lineTow, char *linThre)
+{
+	int linOne = 0;
+	int li = 0;
+	int linethre = 0;
+	printf("%s",line);
+		linOne = ft_strlen(line);
+		li = ft_strlen(lineTow);
+		linethre = ft_strlen(linThre);
+		int i = 0;
+
+	  if(linOne < li)
+	  {
+		i = linOne - 1 ;
+		while (i <= li)
+		{
+			if(lineTow[i] == '0')
+			{
+
+				return 0;
+			}
+			i++;
+		}
+		
+	  }
+	//   if(linOne > li)
+	//   {
+	// 	i = linOne - 1 ;
+	// 	while (i <= li)
+	// 	{
+	// 		if(lineTow[i] == '0')
+	// 		{
+
+	// 			return 0;
+	// 		}
+	// 		i++;
+	// 	}
+		
+	//   }
+	// //   else 
+	if(linOne >= li && li > linethre)
+	  {
+	printf("%d\n",linOne);
+		
+		i = linethre - 1 ;
+		int j = 0;
+		j =li;
+		while (i <= li)
+		{
+			if(lineTow[i] == '0')
+			{
+				return 0;
+			}
+			i++;
+	        // j--;
+		}
+		
+	  }
+	return 1;
+}
+
+int ft_tchking_player(char **maps, int contLaien)
+{
+	int i = 1;
+	int j = 0;
+	int flags = 0;
+
+   if(!chick_all_line(maps[0]) ||!chick_all_line(maps[contLaien - 1]) )
+	return 0;
+	contLaien -= 1;
+	while (i < contLaien)
+	{
+		if (ft_tchklast_laine(maps[i - 1], maps[i],maps[i + 1]) ==  0)
+			return (0);
+		if (maps[i][0] == '0')
+			return 0;
+		j = 1;
+		while ((maps[i][j] != '\0'))
+		{
+			if (maps[i][j + 1] != '\0')
+			{
+				if (maps[i][j] == '0' || maps[i][j] == 'N'|| maps[i][j] == 'S' || maps[i][j] == 'W'|| maps[i][j] == 'E')
+				{
+					if(maps[i][j] == 'N'|| maps[i][j] == 'S' || maps[i][j] == 'W'|| maps[i][j] == 'E')
+						flags++;
+					if ( flags >  1 || (maps[i][j + 1] == ' ')|| (maps[i][j + 1] == '\n') || (j > 0 && maps[i][j - 1] == ' ')
+						|| (i > 0 && (maps[i + 1][j] != '\0') && maps[i - 1][j] == ' ')
+							|| ((i) < contLaien && maps[i + 1][j] == ' '))
+						return ( 0);
+				}
+			}
+			j++;
+		}
+		i++;
+	}
+	if (ft_tchklast_laine(maps[i - 1], maps[i],maps[i + 1]) ==  0)
+			return (0);
+	return 1;
+}
+
+char **men(void)
+{
+	char *line_reading;
+	char **maps = NULL;
+	int i = 0;
+	int j = 0;
+
+	int fd = open("./map/map.cub", O_RDONLY);
+	while ((line_reading = get_next_line(fd)) != NULL)
+	{
+		i++;
+		free(line_reading);
+	}
+	close(fd);
+	fd = open("./map/map.cub", O_RDONLY);
+	maps = malloc(sizeof(char *) * (i ));
+	while ((line_reading = get_next_line(fd)) != NULL)
+	{
+		maps[j] = ft_strdup(line_reading);
+		free(line_reading);
+		j++;
+	}
+	printf("%s",maps[j - 1]);
+		maps[j ] = NULL;
+	// j = 0;
+	if(ft_tchking_player(maps , i))
+	{
+		printf("this maps is good\n");
+		return maps;
+	}
+	else
+	{
+		printf("this maps is open\n");
+		return NULL;
+	}
+
+	return NULL;
+}
+
+/*==================================================================*/
 
 
 void f()
@@ -530,11 +698,11 @@ int main(int ac, char **av)
 	atexit(f);
 	(void)ac;
 	char **maps;
-	// t_vmap v_map;
 	t_data data;
 
+	maps = NULL;
+
 	ft_memset(&data, 0, sizeof(t_data));
-	// atexit(f);
 
 	if ((!av[1]) || ft_parsing(av[1], &data))
 		return (ft_putstr_fd("map not valid!\n", STDERR_FILENO), 1);
@@ -543,15 +711,14 @@ int main(int ac, char **av)
 	if (NULL == maps)
 		return (printf("here\n"), free_v_map(&data.v_map), free(data.v_map._join_map_lines), 1337);
 
-	// data.map = maps;
-	if (ft_start(&data)) // ft_start(&data, maps)
+	maps = men();
+	data.map = maps;
+	if (ft_start(&data))
 		return (1);
 
 	free_v_map(&data.v_map);
 	free(data.v_map._join_map_lines);
 	free_2d_array(maps);
-	
+	free_2d_array(data.map);
 	return (0);
 }
-
-/*===========================================================================================================================================================*/
